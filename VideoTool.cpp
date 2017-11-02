@@ -6,6 +6,11 @@
 //#include <opencv2\cv.h>
 #include "opencv2/opencv.hpp"
 
+#include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#define SIZE 1
 using namespace std;
 using namespace cv;
 //initial min and max HSV filter values.
@@ -175,9 +180,46 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 		else putText(cameraFeed, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
 	}
 }
-int main(int argc, char* argv[])
-{
 
+int client_Socket(char *buffer) 
+{
+  int clientSocket;
+  //char buffer[1024];
+  struct sockaddr_in serverAddr;
+  socklen_t addr_size;
+  
+
+  /*---- Create the socket. The three arguments are: ----*/
+  /* 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) */
+  clientSocket = socket(PF_INET, SOCK_STREAM, 0);
+  
+  /*---- Configure settings of the server address struct ----*/
+  /* Address family = Internet */
+  serverAddr.sin_family = AF_INET;
+  /* Set port number, using htons function to use proper byte order */
+  serverAddr.sin_port = htons(20236);
+  /* Set IP address to localhost */
+  serverAddr.sin_addr.s_addr = inet_addr("193.226.12.217");
+
+  /* Set all bits of the padding field to 0 */
+  memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
+
+  /*---- Connect the socket to the server using the address struct ----*/
+  addr_size = sizeof serverAddr;
+  connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
+  
+  send(clientSocket, buffer, SIZE, 0);
+
+  /*---- Read the message from the server into the buffer ----*/
+  //recv(clientSocket, buffer, 1024, 0);
+
+  /*---- Print the received message ----*/
+ // printf("Data received: %s",buffer);   
+  return 0;
+ }
+int main(/*int argc, char* argv[]*/)
+{
+/*
 	//some boolean variables for different functionality within this
 	//program
 	bool trackObjects = true;
@@ -246,6 +288,16 @@ int main(int argc, char* argv[])
 		//image will not appear without this waitKey() command
 		waitKey(30);
 	}
+*/
+   // functie Socket
+    char buffer[SIZE]= {'s'};
+    //mai multe comenzi cu delay intre ele
+    for(int i = 0; i < SIZE; i++ ){
+      client_Socket(buffer);
+    }
+  
+  
+  return 0;
+ 
 
-	return 0;
 }
