@@ -182,43 +182,6 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 	}
 }
 
-//int client_Socket(char *buffer) 
-//{
- // int clientSocket;
-  //char buffer[1024];
- // struct sockaddr_in serverAddr;
-//  socklen_t addr_size;
-  
-
-  /*---- Create the socket. The three arguments are: ----*/
-  /* 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) */
- // clientSocket = socket(PF_INET, SOCK_STREAM, 0);
-  
-  /*---- Configure settings of the server address struct ----*/
-  /* Address family = Internet */
-//  serverAddr.sin_family = AF_INET;
-  /* Set port number, using htons function to use proper byte order */
- // serverAddr.sin_port = htons(20236);
-  /* Set IP address to localhost */
- // serverAddr.sin_addr.s_addr = inet_addr("193.226.12.217");
-
-  /* Set all bits of the padding field to 0 */
-  //memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
-
-  /*---- Connect the socket to the server using the address struct ----*/
-  //addr_size = sizeof serverAddr;
- // connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
-  
- // send(clientSocket, buffer, SIZE, 0);
-
-  /*---- Read the message from the server into the buffer ----*/
-  //recv(clientSocket, buffer, 1024, 0);
-
-  /*---- Print the received message ----*/
- // printf("Data received: %s",buffer);   
- // return 0;
- //}
- 
  
  void comenzi(char *ip ,int port, char *c) {
    int sockfd, n;
@@ -283,9 +246,9 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 
 }
  
-int main(/*int argc, char* argv[]*/)
+int main(int argc, char* argv[])
 {
-/*
+
 	//some boolean variables for different functionality within this
 	//program
 	bool trackObjects = true;
@@ -323,7 +286,7 @@ int main(/*int argc, char* argv[]*/)
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
 		//filter HSV image between values and store filtered image to
-		//threshold matrix
+		//threshold matrix 
 		inRange(HSV, Scalar(163, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
@@ -332,9 +295,9 @@ int main(/*int argc, char* argv[]*/)
 		//pass in thresholded frame to our object tracking function
 		//this function will return the x and y coordinates of the
 		//filtered object
-		if (trackObjects)
+		if (trackObjects) //albastru: hmin = 74; hmax = 92;
 			trackFilteredObject(x, y, threshold, cameraFeed);
-		inRange(HSV, Scalar(H_MIN, S_MIN, 208), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+		inRange(HSV, Scalar(13, S_MIN, 30), Scalar(H_MAX, 54, V_MAX), threshold);
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -345,6 +308,17 @@ int main(/*int argc, char* argv[]*/)
 		if (trackObjects)
 			trackFilteredObject(x, y, threshold, cameraFeed);
 
+    inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+		//perform morphological operations on thresholded image to eliminate noise
+		//and emphasize the filtered object(s)
+		if (useMorphOps)
+			morphOps(threshold);
+		//pass in thresholded frame to our object tracking function
+		//this function will return the x and y coordinates of the
+		//filtered object
+		if (trackObjects) //albastru: hmin = 74; hmax = 92;
+			trackFilteredObject(x, y, threshold, cameraFeed);
+      
 		//show frames
 		imshow(windowName2, threshold);
 		imshow(windowName, cameraFeed);
@@ -354,15 +328,15 @@ int main(/*int argc, char* argv[]*/)
 		//image will not appear without this waitKey() command
 		waitKey(30);
 	}
-*/
+
    // functie Socket
-   char *ip = (char *) malloc (20*sizeof(char));
+  /* char *ip = (char *) malloc (20*sizeof(char));
    strcpy(ip, "193.226.12.217");
    char *com = (char *) malloc (20*sizeof(char));
    strcpy(com, "lllsrsbsfs");
     comenzi(ip, 20232, com);
   
-  
+  */
   return 0;
  
 
