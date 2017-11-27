@@ -1,15 +1,15 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include<stdlib.h>
+#include <netdb.h>
+#include <unistd.h>
+#include <netinet/in.h>
+
 //#include <opencv2\highgui.h>
 #include "opencv2/highgui/highgui.hpp"
 //#include <opencv2\cv.h>
 #include "opencv2/opencv.hpp"
-
-#include <stdio.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #define SIZE 1
 using namespace std;
 using namespace cv;
@@ -21,6 +21,7 @@ int S_MIN = 0;
 int S_MAX = 256;
 int V_MIN = 0;
 int V_MAX = 256;
+char str2[10];
 //default capture width and height
 const int FRAME_WIDTH = 640;
 const int FRAME_HEIGHT = 480;
@@ -181,42 +182,107 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 	}
 }
 
-int client_Socket(char *buffer) 
-{
-  int clientSocket;
+//int client_Socket(char *buffer) 
+//{
+ // int clientSocket;
   //char buffer[1024];
-  struct sockaddr_in serverAddr;
-  socklen_t addr_size;
+ // struct sockaddr_in serverAddr;
+//  socklen_t addr_size;
   
 
   /*---- Create the socket. The three arguments are: ----*/
   /* 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) */
-  clientSocket = socket(PF_INET, SOCK_STREAM, 0);
+ // clientSocket = socket(PF_INET, SOCK_STREAM, 0);
   
   /*---- Configure settings of the server address struct ----*/
   /* Address family = Internet */
-  serverAddr.sin_family = AF_INET;
+//  serverAddr.sin_family = AF_INET;
   /* Set port number, using htons function to use proper byte order */
-  serverAddr.sin_port = htons(20236);
+ // serverAddr.sin_port = htons(20236);
   /* Set IP address to localhost */
-  serverAddr.sin_addr.s_addr = inet_addr("193.226.12.217");
+ // serverAddr.sin_addr.s_addr = inet_addr("193.226.12.217");
 
   /* Set all bits of the padding field to 0 */
-  memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
+  //memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
 
   /*---- Connect the socket to the server using the address struct ----*/
-  addr_size = sizeof serverAddr;
-  connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
+  //addr_size = sizeof serverAddr;
+ // connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
   
-  send(clientSocket, buffer, SIZE, 0);
+ // send(clientSocket, buffer, SIZE, 0);
 
   /*---- Read the message from the server into the buffer ----*/
   //recv(clientSocket, buffer, 1024, 0);
 
   /*---- Print the received message ----*/
  // printf("Data received: %s",buffer);   
-  return 0;
- }
+ // return 0;
+ //}
+ 
+ 
+ void comenzi(char *ip ,int port, char *c) {
+   int sockfd, n;
+   struct sockaddr_in serv_addr;
+   struct hostent *server;
+   
+   char buffer[256];
+	
+   
+   /* Create a socket point */
+   sockfd = socket(AF_INET, SOCK_STREAM, 0);
+   
+   if (sockfd < 0) {
+      perror("ERROR opening socket");
+      exit(1);
+   }
+	
+   server = gethostbyname(ip);
+   
+   if (server == NULL) {
+      fprintf(stderr,"ERROR, no such host\n");
+      exit(0);
+   }
+   
+   bzero((char *) &serv_addr, sizeof(serv_addr));
+   serv_addr.sin_family = AF_INET;
+   bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+   serv_addr.sin_port = htons(port);
+   
+   /* Now connect to the server */
+   if (connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+      perror("ERROR connecting");
+      exit(1);
+   }
+   
+   /* Now ask for a message from the user, this message
+      * will be read by server
+   */
+   int len= strlen(c);
+	 for(int i=0;i<len;i++)
+   {   
+   /* Send message to the server */
+   sprintf(str2,"%c",c[i]);
+     n = send(sockfd, str2, strlen(str2),0);
+   
+     if (n < 0) {
+      perror("ERROR writing to socket");
+      exit(1);
+     }
+     unsigned int g = sleep(1);
+     
+   }
+   
+   /* Now read server response  */
+   bzero(buffer,256);
+   n = read(sockfd, buffer, 255);
+   
+   if (n < 0) {
+      perror("ERROR reading from socket");
+      exit(1);
+   }
+
+}
+ 
 int main(/*int argc, char* argv[]*/)
 {
 /*
@@ -290,11 +356,11 @@ int main(/*int argc, char* argv[]*/)
 	}
 */
    // functie Socket
-    char buffer[SIZE]= {'s'};
-    //mai multe comenzi cu delay intre ele
-    for(int i = 0; i < SIZE; i++ ){
-      client_Socket(buffer);
-    }
+   char *ip = (char *) malloc (20*sizeof(char));
+   strcpy(ip, "193.226.12.217");
+   char *com = (char *) malloc (20*sizeof(char));
+   strcpy(com, "lllsrsbsfs");
+    comenzi(ip, 20232, com);
   
   
   return 0;
