@@ -1,1 +1,1 @@
-/home/cloud/BG/fic/CMakeFiles/VideoTool.dir
+/home/cloud/gb/fic/CMakeFiles/VideoTool.dir

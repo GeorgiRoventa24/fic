@@ -132,6 +132,7 @@ void morphOps(Mat &thresh) {
 
 
 }
+
 void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 
 	Mat temp;
@@ -246,6 +247,29 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 
 }
  
+void strategie (int x, int y, int xa, int ya)
+{
+  //pp ca robotul e orientat cu fata la dreapta (|| cu ox)
+  char* c = (char *) malloc(10*sizeof(char));
+  strcpy(c, "");
+  
+  if ( x < xa  && y < ya){
+    strcat(c, "rfs");
+  }
+  
+  if ( x< xa && y > ya ){
+    strcat(c, "lfs");
+  }
+  
+  if ( x > xa  && y < ya){
+    strcat(c, "lfs");
+  }
+  
+  if ( x > xa && y > ya ){
+    strcat(c, "lbs");
+  }
+}
+ 
 int main(int argc, char* argv[])
 {
 
@@ -287,7 +311,8 @@ int main(int argc, char* argv[])
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
 		//filter HSV image between values and store filtered image to
 		//threshold matrix 
-		inRange(HSV, Scalar(163, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+   
+		inRange(HSV, Scalar(163, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold); //culoarea roz
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -295,9 +320,10 @@ int main(int argc, char* argv[])
 		//pass in thresholded frame to our object tracking function
 		//this function will return the x and y coordinates of the
 		//filtered object
-		if (trackObjects) //albastru: hmin = 74; hmax = 92;
+		if (trackObjects) 
 			trackFilteredObject(x, y, threshold, cameraFeed);
-		inRange(HSV, Scalar(13, S_MIN, 30), Scalar(H_MAX, 54, V_MAX), threshold);
+      
+		inRange(HSV, Scalar(13, S_MIN, 30), Scalar(H_MAX, 54, V_MAX), threshold); //culoarea galben
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -308,7 +334,7 @@ int main(int argc, char* argv[])
 		if (trackObjects)
 			trackFilteredObject(x, y, threshold, cameraFeed);
 
-    inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+    inRange(HSV, Scalar(74, S_MIN, V_MIN), Scalar(92, S_MAX, V_MAX), threshold); // culoarea albastru
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
